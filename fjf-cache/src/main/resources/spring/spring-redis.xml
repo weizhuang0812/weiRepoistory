@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:jdbc="http://www.springframework.org/schema/jdbc" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:jpa="http://www.springframework.org/schema/data/jpa"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.2.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.2.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.2.xsd">
+
+	<context:property-placeholder
+		ignore-unresolvable="true" location="classpath*:config.properties" />
+
+	<!-- 启用AOP注解 -->
+	<aop:aspectj-autoproxy proxy-target-class="true" />
+	<!-- 配置注解类型的Bean扫描 -->
+	<context:annotation-config />
+	
+<!-- 	 <aop:config>
+		<aop:pointcut id="txRedisPointcut" expression="execution(* com.foriseland.*..*support..*.*(..))" />
+		将切面应用到自定义的切面处理器上,该切面优先级最高执行
+		<aop:aspect ref="redisKeyRuleAspect" order="-9999">
+			<aop:before method="before" pointcut-ref="txRedisPointcut" />
+		</aop:aspect>
+	</aop:config> -->
+	
+	
+	
+	<bean id="jedisPoolConfig" class="redis.clients.jedis.JedisPoolConfig">
+		<property name="maxIdle" value="1000" />
+		<property name="maxWaitMillis" value="1000" />
+		<property name="numTestsPerEvictionRun" value="1024" />
+		<property name="timeBetweenEvictionRunsMillis" value="30000" />
+		<property name="minEvictableIdleTimeMillis" value="-1" />
+		<property name="softMinEvictableIdleTimeMillis" value="10000" />
+		<property name="testOnBorrow" value="true" />
+		<property name="testWhileIdle" value="true" />
+		<property name="testOnReturn" value="false" />
+	</bean>
+
+	<bean id="redisGeneric" class="com.foriseland.fjf.cache.RedisGeneric" init-method="init" destroy-method="close">
+		<property name="clusterNodes" value="${overall_public/redis.hostsAndPorts}"></property>
+		<property name="jedisPoolConfig" ref="jedisPoolConfig"></property>
+		<property name="timeout" value="15000"></property>
+		<property name="maxRedirects" value="300" />
+	</bean>
+
+</beans>

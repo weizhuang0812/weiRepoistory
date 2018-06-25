@@ -1,0 +1,3 @@
+simple=com.alibaba.dubbo.common.store.support.SimpleDataStore
+
+simple=com.alibaba.dubbo.common.store.support.SimpleDataStore

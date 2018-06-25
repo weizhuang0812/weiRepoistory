@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.2.xsd">
+
+
+	<!-- kafka producer 配置 -->
+	<bean id="producerServer" class="com.foriseland.fjf.mq.producer.KafkaProducerGeneric" init-method="init" destroy-method="close">
+		<property name="properties">
+			<props>
+				<prop key="bootstrap.servers">192.168.2.5:9092,192.168.2.5:9093,192.168.2.5:9094</prop>
+				<prop key="acks">all</prop> <!-- acks=0时，producer不会等待确认，直接添加到socket等待发送；acks=1时，等待leader写到local log就行；acks=all或acks=-1时，等待isr中所有副本确认-->
+				<prop key="retries">1</prop>
+				<prop key="batch.size">16384</prop> <!-- 默认是16KB Producer可以将发往同一个Partition的数据做成一个Produce Request发送请求，即Batch批处理，以减少请求次数，该值即为每次批处理的大小。-->
+				<prop key="linger.ms">1</prop>
+				<prop key="buffer.memory">33554432</prop> <!-- Producer可以用来缓存数据的内存大小。该值实际为RecordAccumulator类中的BufferPool，即Producer所管理的最大内存。如果数据产生速度大于向broker发送的速度，producer会阻塞max.block.ms，超时则抛出异常 -->
+				<prop key="serializer.class">kafka.serializer.StringEncoder</prop>
+				<prop key="key.serializer">org.apache.kafka.common.serialization.StringSerializer</prop>
+				<prop key="value.serializer">org.apache.kafka.common.serialization.StringSerializer</prop>
+			</props>
+		</property>
+	</bean>
+
+	<!-- kafka 消费者配置 消息模型可以分为两种， 队列和发布-订阅式 -->
+	<bean id="consumerConfig" class="com.foriseland.fjf.mq.motion.KafkaConsumerManager" init-method="init" destroy-method="close">
+		<property name="properties">
+			<props>
+				<prop key="bootstrap.servers">192.168.2.5:9092,192.168.2.5:9093,192.168.2.5:9094</prop>
+				<prop key="group.id">groupId1</prop> <!-- 制定consumer group 每个Consumer属于一个特定的Consumer Group（可为每个Consumer指定group name，若不指定group name则属于默认的group-->
+				<prop key="enable.auto.commit">true</prop> <!-- 是否自动确认offset ,如果为false 偏移量自己控制 -->
+				<prop key="auto.offset.reset">latest</prop> <!-- 从何处开始消费,latest 表示消费最新消息,earliest 表示从头开始消费,none表示抛出异常,默认latest -->
+				<prop key="auto.commit.interval.ms">1000</prop> <!-- 自动确认offset的时间间隔 -->
+				<prop key="session.timeout.ms">30000</prop> <!-- timeout内心跳未到达服务器，服务器认为心跳丢失，会做rebalence -->
+				<prop key="key.deserializer">org.apache.kafka.common.serialization.StringDeserializer</prop>
+				<prop key="value.deserializer">org.apache.kafka.common.serialization.StringDeserializer</prop>
+				<!-- Partition是物理上的概念，每个Topic包含一个或多个Partition. -->
+			</props>
+		</property>
+	</bean>
+	
+	 <bean id="consumerMotion" class="consumer.demo.ConsumerMotion"></bean>
+
+</beans>

@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+<xsd:schema
+        targetNamespace="http://www.qdingnet.com/schema/excel"
+        xmlns:excel="http://www.qdingnet.com/schema/excel"
+        xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+       <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
+
+       <xsd:element name="sheets">
+              <xsd:annotation>
+                     <xsd:documentation><![CDATA[
+	                 导出配置xml的顶级节点,可以包含多个导出配置
+			]]></xsd:documentation>
+              </xsd:annotation>
+              <xsd:complexType>
+                     <xsd:sequence>
+                            <xsd:choice minOccurs="1" maxOccurs="unbounded">
+                                   <xsd:element ref="excel:sheet"/>
+                            </xsd:choice>
+                     </xsd:sequence>
+              </xsd:complexType>
+       </xsd:element>
+
+       <xsd:element name="sheet">
+              <xsd:annotation>
+                     <xsd:documentation source="java:org.springframework.beans.factory.config.BeanDefinition"><![CDATA[
+                     每个导出详细配置
+			]]></xsd:documentation>
+              </xsd:annotation>
+              <xsd:complexType>
+                     <xsd:sequence>
+                            <xsd:choice minOccurs="1" maxOccurs="unbounded">
+                                   <xsd:element ref="excel:fields"/>
+                            </xsd:choice>
+                     </xsd:sequence>
+                     <xsd:attribute name="name"  type="xsd:string">
+                            <xsd:annotation>
+                                   <xsd:documentation><![CDATA[
+	                        每个不同导出的配置名称，导出时可以指定使用哪个导出配置
+					]]></xsd:documentation>
+                            </xsd:annotation>
+                     </xsd:attribute>
+                     <xsd:attribute name="displayName"  type="xsd:string">
+                            <xsd:annotation>
+                                   <xsd:documentation><![CDATA[
+	                        servlet导出的Excel文件名称，若不指定，则输出文件名是"未指定名称"
+					]]></xsd:documentation>
+                            </xsd:annotation>
+                     </xsd:attribute>
+              </xsd:complexType>
+       </xsd:element>
+
+       <xsd:element name="fields">
+              <xsd:annotation>
+                     <xsd:documentation source="java:org.springframework.beans.factory.config.BeanDefinition"><![CDATA[
+                     导出excel表格内容的配置
+			]]></xsd:documentation>
+              </xsd:annotation>
+              <xsd:complexType>
+                     <xsd:sequence>
+                            <xsd:choice minOccurs="1" maxOccurs="unbounded">
+                                   <xsd:element ref="excel:field"/>
+                            </xsd:choice>
+                     </xsd:sequence>
+              </xsd:complexType>
+       </xsd:element>
+
+       <xsd:element name="field">
+              <xsd:annotation>
+                     <xsd:documentation source="java:org.springframework.beans.factory.config.BeanDefinition"><![CDATA[
+                     每个单元格的详细配置，包括单元格名称(第一行)，单元格内容，转换器
+			]]></xsd:documentation>
+              </xsd:annotation>
+              <xsd:complexType>
+                     <xsd:attribute name="name" type="xsd:string">
+                            <xsd:annotation>
+                                   <xsd:documentation><![CDATA[
+	                        单元格名称(第一行)
+					]]></xsd:documentation>
+                            </xsd:annotation>
+                     </xsd:attribute>
+                     <xsd:attribute name="property" type="xsd:string">
+                            <xsd:annotation>
+                                   <xsd:documentation><![CDATA[
+	                        单元格内容，JavaBean对应的属性名称
+					]]></xsd:documentation>
+                            </xsd:annotation>
+                     </xsd:attribute>
+                     <xsd:attribute name="convert" type="xsd:string">
+                            <xsd:annotation>
+                                   <xsd:documentation><![CDATA[
+	                        转换器，若需要对单元格内容进行特殊处理(如日期转换等)，则需要此属性,
+	                        实例：convert="dict:product_no" 其中dict是转换器名称(可以使用默认的，也可以自定义，自定义需实现IConvert接口，
+	                        或继承AbstractConvert，并且需要在ConverHelper中注入)，
+	                        product_no是转换器参数，暂不支持多个参数
+					]]></xsd:documentation>
+                            </xsd:annotation>
+                     </xsd:attribute>
+              </xsd:complexType>
+       </xsd:element>
+</xsd:schema>
